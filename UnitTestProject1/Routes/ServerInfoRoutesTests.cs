@@ -23,7 +23,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace Kontur.GameStats.Tests.Routes
                 writer.Write("{\"name\": \"] My P3rfect Server [\",\"gameModes\": [ \"DM\", \"TDM\" ]}");
                 writer.Flush();
                 stream.Position = 0;
-                var request = new HttpRequest("PUT", stream);
+                var request = new HttpRequest(HttpMethod.Put, stream);
                 var response = ServerInfoRoutes.ServerInfo(urlArgs, request);
 
                 Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
@@ -82,7 +82,7 @@ namespace Kontur.GameStats.Tests.Routes
                 writer.Write("{\"name\": \"Server\",\"gameModes\": [ \"TDM\", \"TTM\" ]}");
                 writer.Flush();
                 stream.Position = 0;
-                var request = new HttpRequest("PUT", stream);
+                var request = new HttpRequest(HttpMethod.Put, stream);
                 var response = ServerInfoRoutes.ServerInfo(urlArgs, request);
                 Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
             }
@@ -104,7 +104,7 @@ namespace Kontur.GameStats.Tests.Routes
                 GameModes = new[] { new GameMode { Name = "DM" } }
             };
             var urlArgs = new Dictionary<string, string> { { "endpoint", "test.com-8080" } };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var response = ServerInfoRoutes.ServerInfo(urlArgs, request);
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 
@@ -124,7 +124,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestMethod]
         public void TestInvalidHostname()
         {
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { { "endpoint", "test.com" } };
             var response = ServerInfoRoutes.ServerInfo(urlArgs, request);
 
@@ -147,7 +147,7 @@ namespace Kontur.GameStats.Tests.Routes
                 GameModes = new GameMode[0]
             };
             var urlArgs = new Dictionary<string, string>();
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
 
             using (var db = new ServerDatabase())
             {
@@ -169,7 +169,7 @@ namespace Kontur.GameStats.Tests.Routes
         public void TestGetAllServersEmpty()
         {
             var urlArgs = new Dictionary<string, string>();
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             
             var response = ServerInfoRoutes.GetAllServersInfo(urlArgs, request);
             var actual = JToken.Parse(response.Content);

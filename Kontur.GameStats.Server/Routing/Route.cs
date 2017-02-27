@@ -15,9 +15,9 @@ namespace Kontur.GameStats.Server.Routing
         private readonly Regex correctPathRegex =
             new Regex("^\\/$|^(?:(?:\\/\\w+)|(?:\\/<\\w+>)|(?:\\[\\/<\\w+>\\])|(?:\\[\\/\\w+\\]))+$");
         private readonly Func<Dictionary<string, string>, HttpRequest, HttpResponse> handler;
-        private readonly string[] methods;
+        private readonly HttpMethod[] methods;
 
-        public Route(string path, string[] methods,
+        public Route(string path, HttpMethod[] methods,
             Func<Dictionary<string, string>, HttpRequest, HttpResponse> handler)
         {
             if (!correctPathRegex.IsMatch(path))
@@ -39,6 +39,7 @@ namespace Kontur.GameStats.Server.Routing
 
         public HttpResponse Handle(Dictionary<string, string> urlArguments, HttpRequest request)
         {
+
             if (!methods.Contains(request.Method))
                 return new HttpResponse(HttpStatusCode.MethodNotAllowed);
 

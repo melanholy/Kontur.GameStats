@@ -19,9 +19,9 @@ namespace Kontur.GameStats.Server.Routing
     {
         private readonly IEnumerable<Route> routes;
 
-        public Router(IRouteFactory factory)
+        public Router(IRouteProvider provider)
         {
-            routes = factory.GetRoutes().ToList();
+            routes = provider.GetRoutes().ToList();
         }
         
         public RouteMatchResult Match(string path)

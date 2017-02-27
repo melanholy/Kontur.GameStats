@@ -85,6 +85,7 @@
     <Compile Include="Converters\JsonGameServerConverter.cs" />
     <Compile Include="Database\DatabaseInitializer.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Models\GameMode.cs" />
     <Compile Include="Models\PlayerScore.cs" />
     <Compile Include="Routes\MatchInfoRoutes.cs" />
@@ -92,13 +93,12 @@
     <Compile Include="Routes\ServerInfoRoutes.cs" />
     <Compile Include="Routing\HttpRequest.cs" />
     <Compile Include="Routing\HttpResponse.cs" />
-    <Compile Include="Routing\IRouteFactory.cs" />
+    <Compile Include="Routing\IRouteProvider.cs" />
     <Compile Include="Converters\JsonDoubleConverter.cs" />
     <Compile Include="Converters\JsonGameModeCollectionConverter.cs" />
     <Compile Include="ApiDatatypes\MatchesStats.cs" />
     <Compile Include="ApiDatatypes\PlayerStats.cs" />
-    <Compile Include="Routes\StatServerRouteFactory.cs" />
-    <Compile Include="HttpException.cs" />
+    <Compile Include="Routing\StatServerRouteProvider.cs" />
     <Compile Include="Converters\JsonPlayerScoreConverter.cs" />
     <Compile Include="Models\GameMatch.cs" />
     <Compile Include="Models\GameServer.cs" />

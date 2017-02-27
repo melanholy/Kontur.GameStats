@@ -3,6 +3,7 @@ using Fclp;
 using InteractivePreGeneratedViews;
 using Kontur.GameStats.Server.Database;
 using Kontur.GameStats.Server.Routes;
+using Kontur.GameStats.Server.Routing;
 
 namespace Kontur.GameStats.Server
 {
@@ -39,7 +40,7 @@ namespace Kontur.GameStats.Server
 
         private static void RunServer(Options options)
         {
-            var routeFactory = new StatServerRouteFactory();
+            var routeFactory = new StatServerRouteProvider();
             using (var server = new StatServer(routeFactory))
             {
                 server.Start(options.Prefix);

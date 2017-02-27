@@ -17,7 +17,7 @@ namespace Kontur.GameStats.Tests.Routing
         {
             var expectedResponse = new HttpResponse(HttpStatusCode.OK);
             var args = new Dictionary<string, string>();
-            var getRequest = new HttpRequest("GET", Stream.Null);
+            var getRequest = new HttpRequest(HttpMethod.Get, Stream.Null);
 
             var mockHandler =
                 MockRepository.GenerateStub<Func<Dictionary<string, string>, HttpRequest, HttpResponse>>();
@@ -25,14 +25,14 @@ namespace Kontur.GameStats.Tests.Routing
                 .Stub(x => x(Arg<Dictionary<string, string>>.Is.Same(args), Arg<HttpRequest>.Is.Same(getRequest)))
                 .Return(expectedResponse);
 
-            var route = new Route("/test", new[] { "GET", "PUT" }, mockHandler);
+            var route = new Route("/test", new[] { HttpMethod.Get, HttpMethod.Put }, mockHandler);
             var actualResponse = route.Handle(args, getRequest);
             
             Assert.AreSame(expectedResponse, actualResponse);
             mockHandler.AssertWasCalled(x => 
                 x(Arg<Dictionary<string, string>>.Is.Same(args), Arg<HttpRequest>.Is.Same(getRequest)));
             
-            var putRequest = new HttpRequest("PUT", Stream.Null);
+            var putRequest = new HttpRequest(HttpMethod.Put, Stream.Null);
             mockHandler
                 .Stub(x => x(Arg<Dictionary<string, string>>.Is.Same(args), Arg<HttpRequest>.Is.Same(putRequest)))
                 .Return(expectedResponse);
@@ -48,9 +48,9 @@ namespace Kontur.GameStats.Tests.Routing
         {
             var mockHandler =
                 MockRepository.GenerateStub<Func<Dictionary<string, string>, HttpRequest, HttpResponse>>();
-            var route = new Route("/", new []{"GET", "PUT"}, mockHandler);
+            var route = new Route("/", new []{HttpMethod.Get, HttpMethod.Put}, mockHandler);
 
-            var postRequest = new HttpRequest("POST", Stream.Null);
+            var postRequest = new HttpRequest(HttpMethod.Post, Stream.Null);
 
             Assert.AreEqual(route.Handle(null, postRequest).StatusCode, HttpStatusCode.MethodNotAllowed);
             mockHandler.AssertWasNotCalled(x => 

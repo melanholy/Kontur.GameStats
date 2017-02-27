@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Kontur.GameStats.Server.Routes
 {
-    public class ReportsRoutes : StatServerRouteFactory.RouteProvider
+    public class ReportsRoutes : StatServerRouteProvider
     {
         private const int DefaultCountValue = 5;
         private const int MaxCountValue = 50;
@@ -27,7 +27,7 @@ namespace Kontur.GameStats.Server.Routes
 
         public ReportsRoutes()
         {
-            RegisterRoute("/reports/<entity>[/<count>]", new[] { "GET" }, ReportWithCount);
+            RegisterRoute("/reports/<entity>[/<count>]", new[] {HttpMethod.Get}, ReportWithCount);
         }
 
         private static IEnumerable<GameMatch> GetRecentMatchesWithConstraint(

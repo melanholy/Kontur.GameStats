@@ -7,15 +7,15 @@ namespace Kontur.GameStats.Tests.Routing
     [TestClass]
     public class RouterTests
     {
-        private class TestFactory : IRouteFactory
+        private class TestProvider : IRouteProvider
         {
-            public static readonly Route TestRouteSimple = new Route("/test", new[] { "GET" },
+            public static readonly Route TestRouteSimple = new Route("/test", new[] { HttpMethod.Get },
                 (dictionary, request) => null);
-            public static readonly Route TestRouteWithVariables = new Route("/player/<name>/<age>", new[] { "GET" },
+            public static readonly Route TestRouteWithVariables = new Route("/player/<name>/<age>", new[] { HttpMethod.Get },
                 (dictionary, request) => null);
-            public static readonly Route TestRouteWithOptionalPath = new Route("/server[/optional]/needed[/another]", new[] { "GET" },
+            public static readonly Route TestRouteWithOptionalPath = new Route("/server[/optional]/needed[/another]", new[] { HttpMethod.Get },
                 (dictionary, request) => null);
-            public static readonly Route TestRouteComplex = new Route("/path[/<optionalArg>]/<neededArg>/end", new[] { "GET" },
+            public static readonly Route TestRouteComplex = new Route("/path[/<optionalArg>]/<neededArg>/end", new[] { HttpMethod.Get },
                 (dictionary, request) => null);
 
             public IEnumerable<Route> GetRoutes()
@@ -30,7 +30,7 @@ namespace Kontur.GameStats.Tests.Routing
             }
         }
 
-        private readonly Router router = new Router(new TestFactory());
+        private readonly Router router = new Router(new TestProvider());
         
         [TestMethod]
         public void TestRouteMatchSimple()
@@ -43,7 +43,7 @@ namespace Kontur.GameStats.Tests.Routing
             Assert.IsNull(match);
 
             match = router.Match("/test");
-            Assert.AreSame(match.Route, TestFactory.TestRouteSimple);
+            Assert.AreSame(match.Route, TestProvider.TestRouteSimple);
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace Kontur.GameStats.Tests.Routing
             Assert.IsNull(match);
 
             match = router.Match("/player/name/age");
-            Assert.AreSame(match.Route, TestFactory.TestRouteWithVariables);
+            Assert.AreSame(match.Route, TestProvider.TestRouteWithVariables);
             Assert.IsTrue(match.UrlArguments.ContainsKey("name"));
             Assert.IsTrue(match.UrlArguments.ContainsKey("age"));
             Assert.AreEqual(match.UrlArguments["name"], "name");
@@ -71,24 +71,24 @@ namespace Kontur.GameStats.Tests.Routing
             Assert.IsNull(match);
 
             match = router.Match("/server/optional/needed");
-            Assert.AreSame(match.Route, TestFactory.TestRouteWithOptionalPath);
+            Assert.AreSame(match.Route, TestProvider.TestRouteWithOptionalPath);
             match = router.Match("/server/needed");
-            Assert.AreSame(match.Route, TestFactory.TestRouteWithOptionalPath);
+            Assert.AreSame(match.Route, TestProvider.TestRouteWithOptionalPath);
             match = router.Match("/server/optional/needed/another");
-            Assert.AreSame(match.Route, TestFactory.TestRouteWithOptionalPath);
+            Assert.AreSame(match.Route, TestProvider.TestRouteWithOptionalPath);
         }
 
         [TestMethod]
         public void TestRouteMatchComplex()
         {
             var match = router.Match("/path/needed/end");
-            Assert.AreSame(match.Route, TestFactory.TestRouteComplex);
+            Assert.AreSame(match.Route, TestProvider.TestRouteComplex);
             Assert.IsTrue(match.UrlArguments.ContainsKey("neededArg"));
             Assert.IsFalse(match.UrlArguments.ContainsKey("optionalArg"));
             Assert.AreEqual(match.UrlArguments["neededArg"], "needed");
 
             match = router.Match("/path/optional/needed/end");
-            Assert.AreSame(match.Route, TestFactory.TestRouteComplex);
+            Assert.AreSame(match.Route, TestProvider.TestRouteComplex);
             Assert.IsTrue(match.UrlArguments.ContainsKey("neededArg"));
             Assert.IsTrue(match.UrlArguments.ContainsKey("optionalArg"));
             Assert.AreEqual(match.UrlArguments["neededArg"], "needed");

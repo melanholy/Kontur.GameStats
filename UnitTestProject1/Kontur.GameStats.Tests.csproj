@@ -92,7 +92,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Routes\BestPlayersRouteTests.cs" />
-    <Compile Include="EffortProviderFactory.cs" />
+    <Compile Include="EffortConnectionFactory.cs" />
     <Compile Include="Routes\MatchInfoRoutesTests.cs" />
     <Compile Include="Routes\PlayerStatsRouteTest.cs" />
     <Compile Include="Routes\PopularServersRouteTests.cs" />

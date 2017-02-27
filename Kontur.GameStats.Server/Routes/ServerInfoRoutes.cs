@@ -12,10 +12,11 @@ using Newtonsoft.Json;
 
 namespace Kontur.GameStats.Server.Routes
 {
-    public class ServerInfoRoutes : StatServerRouteFactory.RouteProvider
+    public class ServerInfoRoutes : StatServerRouteProvider
     {
         private static readonly JsonGameModeCollectionConverter GameModeCollectionConverter =
             new JsonGameModeCollectionConverter();
+
         private static readonly JsonGameServerConverter GameServerConverter =
             new JsonGameServerConverter();
 
@@ -26,8 +27,8 @@ namespace Kontur.GameStats.Server.Routes
 
         public ServerInfoRoutes()
         {
-            RegisterRoute("/servers/info", new[] { "GET" }, GetAllServersInfo);
-            RegisterRoute("/servers/<endpoint>/info", new[] { "PUT", "GET" }, ServerInfo);
+            RegisterRoute("/servers/info", new[] {HttpMethod.Get}, GetAllServersInfo);
+            RegisterRoute("/servers/<endpoint>/info", new[] {HttpMethod.Put, HttpMethod.Get}, ServerInfo);
         }
 
         private static HttpResponse GetServerInfo(Dictionary<string, string> urlArgs)
@@ -51,15 +52,24 @@ namespace Kontur.GameStats.Server.Routes
             }
         }
 
-        private static HttpResponse AddServerInfo(Dictionary<string, string> urlArgs, HttpRequest request)
+        private static HttpResponse AddOrUpdateServerInfo(Dictionary<string, string> urlArgs,
+            HttpRequest request)
         {
             string data;
             using (var reader = new StreamReader(request.InputStream))
                 data = reader.ReadToEnd();
 
-            var server = JsonConvert.DeserializeObject<GameServer>(
-                data,
-                GameModeCollectionConverter);
+            GameServer server;
+            try
+            {
+                server = JsonConvert.DeserializeObject<GameServer>(
+                    data,
+                    GameModeCollectionConverter);
+            }
+            catch (JsonReaderException)
+            {
+                return new HttpResponse(HttpStatusCode.BadRequest);
+            }
             server.Endpoint = urlArgs["endpoint"];
 
             using (var db = new ServerDatabase())
@@ -89,8 +99,8 @@ namespace Kontur.GameStats.Server.Routes
             if (!EndpointRegex.IsMatch(address))
                 return new HttpResponse(HttpStatusCode.BadRequest);
 
-            if (request.Method == "PUT")
-                return AddServerInfo(urlArgs, request);
+            if (request.Method == HttpMethod.Put)
+                return AddOrUpdateServerInfo(urlArgs, request);
 
             return GetServerInfo(urlArgs);
         }

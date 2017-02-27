@@ -19,7 +19,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         [TestMethod]
@@ -58,7 +58,7 @@ namespace Kontur.GameStats.Tests.Routes
                     db.SaveChanges();
                 }
 
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { {"entity", "popular-servers"} };
             var response = ReportsRoutes.ReportWithCount(urlArgs, request);
             var actual = JsonConvert.DeserializeObject<List<PopularServerReport>>(response.Content);
@@ -78,7 +78,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestMethod]
         public void TestPopularServersEmpty()
         {
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { { "entity", "popular-servers" } };
             var response = ReportsRoutes.ReportWithCount(urlArgs, request);
             var actual = JsonConvert.DeserializeObject<List<PopularServerReport>>(response.Content);

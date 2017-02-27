@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 namespace Kontur.GameStats.Server.Routes
 {
-    public class StatsRoutes : StatServerRouteFactory.RouteProvider
+    public class StatsRoutes : StatServerRouteProvider
     {
         private static readonly JsonDoubleConverter DoubleConverter =
             new JsonDoubleConverter();
@@ -27,8 +27,8 @@ namespace Kontur.GameStats.Server.Routes
 
         public StatsRoutes()
         {
-            RegisterRoute("/servers/<endpoint>/stats", new []{"GET"}, GetServerStatsByEndpoint);
-            RegisterRoute("/players/<name>/stats", new []{"GET"}, GetPlayerStatsByName);
+            RegisterRoute("/servers/<endpoint>/stats", new []{HttpMethod.Get}, GetServerStatsByEndpoint);
+            RegisterRoute("/players/<name>/stats", new []{HttpMethod.Get}, GetPlayerStatsByName);
         }
 
         private static MatchesStats GetServerStatsByField(Expression<Func<GameMatch, bool>> selector)

@@ -18,11 +18,11 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         [TestMethod]
-        public void PlayerStatsNormal()
+        public void TestPlayerStatsNormal()
         {
             var server1 = new GameServer
             {
@@ -83,7 +83,7 @@ namespace Kontur.GameStats.Tests.Routes
             }
 
             var urlArgs = new Dictionary<string, string> { {"name", "two"} };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var response = StatsRoutes.GetPlayerStatsByName(urlArgs, request);
             var expected = new PlayerStats
             {
@@ -103,7 +103,7 @@ namespace Kontur.GameStats.Tests.Routes
         public void TestPlayerStatsEmpty()
         {
             var urlArgs = new Dictionary<string, string> { { "name", "two" } };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var response = StatsRoutes.GetPlayerStatsByName(urlArgs, request);
             var expected = new PlayerStats
             {

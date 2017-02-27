@@ -3,9 +3,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Kontur.GameStats.Server.Routes;
 using Kontur.GameStats.Server.Routing;
-using IRouteFactory = Kontur.GameStats.Server.Routing.IRouteFactory;
 
 namespace Kontur.GameStats.Server
 {
@@ -17,11 +15,13 @@ namespace Kontur.GameStats.Server
         private Thread listenerThread;
         private bool disposed;
         private volatile bool isRunning;
+        private readonly Logger logger;
 
-        public StatServer(IRouteFactory routeFactory)
+        public StatServer(IRouteProvider routeProvider)
         {
+            logger = new Logger("log.txt");
             listener = new HttpListener();
-            router = new Router(routeFactory);
+            router = new Router(routeProvider);
         }
 
         public void Start(string prefix)
@@ -95,9 +95,20 @@ namespace Kontur.GameStats.Server
                 }
                 catch (Exception error)
                 {
-                    // TODO: log errors
+                    logger.Log($"[{DateTime.Now}]");
+                    logger.Log(error.Message);
+                    logger.Log(error.StackTrace);
                 }
             }
+        }
+
+        private string GetErrorMessage(HttpListenerRequest request, int status)
+        {
+            return string.Format(
+                "{0} [{1}] \"{2} {3}\" {4}",
+                request.UserHostAddress, DateTime.Now,
+                request.HttpMethod, request.Url.AbsolutePath,
+                status);
         }
         
         private async Task HandleContextAsync(HttpListenerContext listenerContext)
@@ -107,24 +118,30 @@ namespace Kontur.GameStats.Server
             {
                 var match = router.Match(listenerContext.Request.Url.AbsolutePath);
                 if (match != null)
+                {
+                    var request = HttpRequest.FromHttpListenerRequest(listenerContext.Request);
                     httpResponse = await match.Route.HandleAsync(
-                        match.UrlArguments, 
-                        HttpRequest.FromHttpListenerRequest(listenerContext.Request));
+                        match.UrlArguments, request);
+                }
                 else
                     httpResponse = new HttpResponse(HttpStatusCode.NotFound);
             }
-            catch
+            catch (Exception error)
             {
+                logger.Log(GetErrorMessage(listenerContext.Request, (int) HttpStatusCode.InternalServerError));
+                logger.Log(error.Message);
+                logger.Log(error.StackTrace);
                 httpResponse = new HttpResponse(HttpStatusCode.InternalServerError);
             }
-            
-            listenerContext.Response.StatusCode = (int)httpResponse.StatusCode;
+
+            var statusCode = (int)httpResponse.StatusCode;
+            listenerContext.Response.StatusCode = statusCode;
             using (var writer = new StreamWriter(listenerContext.Response.OutputStream))
                 if (httpResponse.Content != null)
                     await writer.WriteAsync(httpResponse.Content);
-
-            if ((int)httpResponse.StatusCode >= 400)
-                throw new HttpException(httpResponse.StatusCode);
+            
+            if (statusCode >= 400 && statusCode != (int)HttpStatusCode.InternalServerError)
+                logger.Log(GetErrorMessage(listenerContext.Request, statusCode));
         }
     }
 }

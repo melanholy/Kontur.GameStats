@@ -16,7 +16,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
             var server = new GameServer
             {
                 Endpoint = "test.com",
@@ -62,7 +62,7 @@ namespace Kontur.GameStats.Tests.Routes
                 {"entity", "recent-matches"},
                 {"count", count.ToString()}
             };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var response = ReportsRoutes.ReportWithCount(urlArgs, request);
             var array = JArray.Parse(response.Content);
 

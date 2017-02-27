@@ -17,7 +17,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         private static readonly GameServer testServer = new GameServer
@@ -56,7 +56,7 @@ namespace Kontur.GameStats.Tests.Routes
             {
                 {"entity", "recent-matches" }
             };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             
             var timestamp = DateTime.MinValue.AddDays(5);
             using (var db = new ServerDatabase())
@@ -72,7 +72,15 @@ namespace Kontur.GameStats.Tests.Routes
             var response = ReportsRoutes.ReportWithCount(urlArgs, request);
             var actualJson = JToken.Parse(response.Content);
             var expected =
-                "[{\"server\":\"test.com\",\"timestamp\":\"0001-01-08T00:00:00Z\",\"results\":{\"scoreboard\":[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}],\"map\":\"Dust\",\"gameMode\":\"DM\",\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}},{\"server\":\"test.com\",\"timestamp\":\"0001-01-07T00:00:00Z\",\"results\":{\"scoreboard\":[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}],\"map\":\"Dust\",\"gameMode\":\"DM\",\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}},{\"server\":\"test.com\",\"timestamp\":\"0001-01-06T00:00:00Z\",\"results\":{\"scoreboard\":[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}],\"map\":\"Dust\",\"gameMode\":\"DM\",\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}}]";
+                "[{\"server\":\"test.com\",\"timestamp\":\"0001-01-08T00:00:00Z\",\"results\":{" +
+                "\"scoreboard\":[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}]" +
+                ",\"map\":\"Dust\",\"gameMode\":\"DM\",\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}}" +
+                ",{\"server\":\"test.com\",\"timestamp\":\"0001-01-07T00:00:00Z\",\"results\":{" +
+                "\"scoreboard\":[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}]," +
+                "\"map\":\"Dust\",\"gameMode\":\"DM\",\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}}" +
+                ",{\"server\":\"test.com\",\"timestamp\":\"0001-01-06T00:00:00Z\",\"results\":{\"scoreboard\":" + 
+                "[{\"name\":\"Vasya\",\"frags\":0,\"kills\":42,\"deaths\":0}],\"map\":\"Dust\",\"gameMode\":\"DM\"," +
+                "\"fragLimit\":0,\"timeLimit\":0,\"timeElapsed\":0.000000}}]";
             var expectedJson = JToken.Parse(expected);
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
@@ -83,7 +91,7 @@ namespace Kontur.GameStats.Tests.Routes
         public void TestRecentMatchesEmpty()
         {
             var urlArgs = new Dictionary<string, string> { {"entity", "recent-matches"} };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
 
             var response = ReportsRoutes.ReportWithCount(urlArgs, request);
             var actualJson = JToken.Parse(response.Content);

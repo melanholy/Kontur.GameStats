@@ -19,7 +19,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace Kontur.GameStats.Tests.Routes
                 .OrderByDescending(x => x.Value)
                 .Select(x => x.Key);
             
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { {"endpoint", "test.com-8080"} };
             var response = StatsRoutes.GetServerStatsByEndpoint(urlArgs, request);
             var actual = JsonConvert.DeserializeObject<MatchesStats>(response.Content);
@@ -100,7 +100,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestMethod]
         public void TestMatchesStatsEmpty()
         {
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { { "endpoint", "test.com-8080" } };
             var response = StatsRoutes.GetServerStatsByEndpoint(urlArgs, request);
             var actual = JsonConvert.DeserializeObject<MatchesStats>(response.Content);
@@ -117,7 +117,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestMethod]
         public void TestMatchesStatsInvalidHostname()
         {
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { { "endpoint", "test.com" } };
             var response = StatsRoutes.GetServerStatsByEndpoint(urlArgs, request);
 

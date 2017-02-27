@@ -43,7 +43,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestInitialize]
         public void Setup()
         {
-            EffortProviderFactory.ResetDb();
+            EffortConnectionFactory.ResetDb();
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace Kontur.GameStats.Tests.Routes
                 { "endpoint", "test.com-8080" },
                 { "timestamp", "0001-01-01T00:00:00Z" }
             };
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var response = MatchInfoRoutes.MatchInfo(urlArgs, request);
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
 
@@ -86,7 +86,7 @@ namespace Kontur.GameStats.Tests.Routes
             };
             var server = testServer;
             var expected = testMatch;
-            var request = new HttpRequest("PUT", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Put, Stream.Null);
             var response = MatchInfoRoutes.MatchInfo(urlArgs, request);
             Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
 
@@ -104,7 +104,7 @@ namespace Kontur.GameStats.Tests.Routes
                                 ""timeLimit"":0,""timeElapsed"":0.000000}");
                 writer.Flush();
                 stream.Position = 0;
-                request = new HttpRequest("PUT", stream);
+                request = new HttpRequest(HttpMethod.Put, stream);
                 response = MatchInfoRoutes.MatchInfo(urlArgs, request);
             }
 
@@ -119,7 +119,7 @@ namespace Kontur.GameStats.Tests.Routes
         [TestMethod]
         public void TestInvalidHostname()
         {
-            var request = new HttpRequest("GET", Stream.Null);
+            var request = new HttpRequest(HttpMethod.Get, Stream.Null);
             var urlArgs = new Dictionary<string, string> { { "endpoint", "test.com" } };
             var response = MatchInfoRoutes.MatchInfo(urlArgs, request);
 

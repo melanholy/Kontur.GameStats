@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 
 namespace Kontur.GameStats.Server.Routes
 {
-    public class MatchInfoRoutes : StatServerRouteFactory.RouteProvider
+    public class MatchInfoRoutes : StatServerRouteProvider
     {
         private static readonly JsonDoubleConverter DoubleConverter =
             new JsonDoubleConverter();
@@ -29,7 +29,7 @@ namespace Kontur.GameStats.Server.Routes
         {
             RegisterRoute(
                 "/servers/<endpoint>/matches/<timestamp>", 
-                new[] { "PUT", "GET" }, 
+                new[] {HttpMethod.Put, HttpMethod.Get}, 
                 MatchInfo);
         }
 
@@ -46,9 +46,18 @@ namespace Kontur.GameStats.Server.Routes
                 using (var reader = new StreamReader(request.InputStream))
                     data = reader.ReadToEnd();
 
-                var match = JsonConvert.DeserializeObject<GameMatch>(
-                    data,
-                    PlayerScoreConverter);
+                GameMatch match;
+                try
+                {
+                    match = JsonConvert.DeserializeObject<GameMatch>(
+                        data,
+                        PlayerScoreConverter);
+                }
+                catch (JsonReaderException)
+                {
+                    return new HttpResponse(HttpStatusCode.BadRequest);
+                }
+
                 match.Server = server;
                 match.Timestamp = DateTime.Parse(urlArgs["timestamp"]).ToUniversalTime();
                 match.TotalPlayers = match.Scoreboard.Count;
@@ -92,7 +101,7 @@ namespace Kontur.GameStats.Server.Routes
             if (!EndpointRegex.IsMatch(address))
                 return new HttpResponse(HttpStatusCode.BadRequest);
 
-            if (request.Method == "PUT")
+            if (request.Method == HttpMethod.Put)
                 return AddMatch(urlArgs, request);
 
             return GetMatch(urlArgs);
